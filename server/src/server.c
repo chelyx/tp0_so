@@ -17,7 +17,7 @@ int main(void) {
 		case PAQUETE:
 			lista = recibir_paquete(cliente_fd);
 			log_info(logger, "Me llegaron los siguientes valores:\n");
-			list_iterate(lista, (void*) iterator);
+			iterator(logger, lista);
 			break;
 		case -1:
 			log_error(logger, "el cliente se desconecto. Terminando servidor");
@@ -31,6 +31,12 @@ int main(void) {
 	return EXIT_SUCCESS;
 }
 
-void iterator(t_log* logger, char* value) {
-	log_info(logger,"%s\n", value);
+void iterator(t_log* logger, t_list* self) {
+	t_link_element *element = self->head;
+	t_link_element *aux = NULL;
+	while (element != NULL) {
+		aux = element->next;
+		log_info(logger, element->data);
+		element = aux;
+	}
 }

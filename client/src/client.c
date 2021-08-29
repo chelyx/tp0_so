@@ -25,24 +25,17 @@ int main(void){
 	log_info(logger, ip);
 	log_info(logger, puerto);
 
-	leer_consola(logger);
-
-	/*---------------------------------------------------PARTE 3-------------------------------------------------------------*/
-
 	// Antes de continuar, tenemos que asegurarnos que el servidor esté corriendo porque lo necesitaremos para lo que sigue.
 
 	// Creamos una conexión hacia el servidor
 	conexion = crear_conexion(ip, puerto);
 
-	//enviar CLAVE al servirdor
+	//enviar CLAVE al servidor
 	enviar_mensaje(valor, conexion);
 
-	paquete(conexion);
+	paquete(conexion, logger);
 
 	terminar_programa(conexion, logger, config);
-
-	/*---------------------------------------------------PARTE 5-------------------------------------------------------------*/
-	// Proximamente
 }
 
 t_log* iniciar_logger(void){
@@ -67,20 +60,31 @@ void leer_consola(t_log* logger){
 		free(leido);
 		leido = readline(">");
 	}
-	free(1); // es asi?
+	//free(leido); // es asi?
 
 }
 
-void paquete(int conexion){
-	//Ahora toca lo divertido!
-
+void paquete(int conexion, t_log* logger){
 	char* leido;
-	t_paquete* paquete;
+	t_paquete* paquete = crear_paquete();
+	int size;
 
+	leido = readline(">");
 
+	while (strcmp(leido, "") != 0) {
+		log_info(logger, leido);
+		size = strlen(leido)+1;
+		agregar_a_paquete(paquete, leido, size);
+		free(leido);
+		leido = readline(">");
+	}
+
+	enviar_paquete(paquete, conexion);
+	eliminar_paquete(paquete);
 }
 
 void terminar_programa(int conexion, t_log* logger, t_config* config){
 	log_destroy(logger);
 	liberar_conexion(conexion);
+	config_destroy(config);
 }

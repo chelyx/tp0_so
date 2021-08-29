@@ -16,12 +16,10 @@ void* serializar_paquete(t_paquete* paquete, int bytes)
 	return magic;
 }
 
-int crear_conexion(char *ip, char* puerto)
-{
+int crear_conexion(char *ip, char* puerto){
+	t_log* logger = iniciar_logger();
 	struct addrinfo hints;
 	struct addrinfo *server_info;
-	t_log* logger = iniciar_logger();
-
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
@@ -32,10 +30,20 @@ int crear_conexion(char *ip, char* puerto)
 
 	// Ahora vamos a crear el socket.
 	int socket_cliente = socket(server_info->ai_family, server_info->ai_socktype, server_info->ai_protocol);
+	log_info(logger, "crear socket");
 
 	// Ahora que tenemos el socket, vamos a conectarlo
 	connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen);
 
+	send_handshake(socket_cliente);
+
+	freeaddrinfo(server_info);
+	log_destroy(logger); //TODO: borrar logger
+	return socket_cliente;
+}
+
+void send_handshake(int socket_cliente) {
+	t_log* logger = iniciar_logger();
 	uint32_t handshake = 1;
 	uint32_t result;
 	send(socket_cliente, &handshake, sizeof(uint32_t), NULL);
@@ -47,9 +55,7 @@ int crear_conexion(char *ip, char* puerto)
 		log_info(logger, "Se conecto correctamente");
 	}
 
-	freeaddrinfo(server_info);
-
-	return socket_cliente;
+	log_destroy(logger);//TODO: dejar?
 }
 
 void enviar_mensaje(char* mensaje, int socket_cliente)

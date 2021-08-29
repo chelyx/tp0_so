@@ -24,6 +24,7 @@ int iniciar_servidor(void){
     freeaddrinfo(server_info);
 
     log_trace(logger, "Listo para escuchar a mi cliente");
+    log_info(logger, "Listo para escuchar a mi cliente");
 
     return socket_servidor;
 }
@@ -35,6 +36,14 @@ int esperar_cliente(int socket_servidor){
 	// Aceptamos un nuevo cliente
 	int socket_cliente = accept(socket_servidor, NULL, NULL);
 
+	rcv_handshake(socket_cliente);
+
+	log_info(logger, "Se conecto un cliente!");
+
+	return socket_cliente;
+}
+
+void rcv_handshake(int socket_cliente) {
 	uint32_t handshake;
 	uint32_t resultOk = 0;
 	uint32_t resultError = -1;
@@ -44,10 +53,6 @@ int esperar_cliente(int socket_servidor){
 	   send(socket_cliente, &resultOk, sizeof(uint32_t), NULL);
 	else
 	   send(socket_cliente, &resultError, sizeof(uint32_t), NULL);
-
-	log_info(logger, "Se conecto un cliente!");
-
-	return socket_cliente;
 }
 
 int recibir_operacion(int socket_cliente){

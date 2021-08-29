@@ -7,6 +7,6 @@
 #include <commons/log.h>
 #include "utils.h"
 
-void iterator(t_log* logger, char* value);
+void iterator(t_log* logger, t_list* self);
 
 #endif /* SERVER_H_ */
